@@ -227,20 +227,17 @@
 
     .nav-menu-btn:hover span { width: 20px; }
 
-    /* ─── Hero Section — tall scroll driver ─────────────── */
+    /* ─── Hero Section — discrete step scroll ───────────── */
     .hero {
       position: relative;
       width: 100%;
-      height: calc(100vh + 620px); /* 620px sticky range → ~206px per house */
-    }
-
-    /* The sticky frame — stays at top while hero scrolls */
-    .hero-sticky {
-      position: sticky;
-      top: 0;
-      width: 100%;
       height: 100vh;
       min-height: 700px;
+    }
+
+    .hero-sticky {
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -510,30 +507,40 @@
       align-items: center;
       justify-content: center;
       opacity: 0;
-      /* Enter-from state: comes up from below with tilt */
-      transform: translateY(70px) scale(0.88) rotateX(14deg);
-      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1),
-                  transform 0.85s cubic-bezier(0.16,1,0.3,1);
+      transform: translateY(48px) scale(0.93);
+      /* Snappy spring — 220ms max */
+      transition: opacity 0.22s cubic-bezier(0.25, 1, 0.35, 1),
+                  transform 0.26s cubic-bezier(0.25, 1, 0.35, 1);
       pointer-events: none;
       transform-style: preserve-3d;
     }
 
     .house-scene.active {
       opacity: 1;
-      transform: translateY(0px) scale(1) rotateX(0deg);
+      transform: translateY(0px) scale(1);
       pointer-events: auto;
       animation: house-breathe 7s ease-in-out infinite;
     }
 
-    /* Exit-to state: floats up and tilts back into distance */
-    .house-scene.exit {
+    /* Push-out upward when exiting */
+    .house-scene.exit-up {
       opacity: 0;
-      transform: translateY(-50px) scale(1.06) rotateX(-10deg);
+      transform: translateY(-44px) scale(1.05);
+      transition: opacity 0.2s cubic-bezier(0.4, 0, 1, 1),
+                  transform 0.24s cubic-bezier(0.4, 0, 1, 1);
+    }
+
+    /* Push-out downward when going back */
+    .house-scene.exit-down {
+      opacity: 0;
+      transform: translateY(44px) scale(1.05);
+      transition: opacity 0.2s cubic-bezier(0.4, 0, 1, 1),
+                  transform 0.24s cubic-bezier(0.4, 0, 1, 1);
     }
 
     @keyframes house-breathe {
-      0%,100% { transform: translateY(0px)  scale(1)    rotateX(0deg); }
-      50%      { transform: translateY(-14px) scale(1.01) rotateX(1.5deg); }
+      0%,100% { transform: translateY(0px) scale(1); }
+      50%      { transform: translateY(-12px) scale(1.01); }
     }
 
     .house-img {
@@ -1880,19 +1887,43 @@
     progressBar.style.transform = `scaleX(${progress})`;
   }
 
-  // ─── Smooth Inertia Scroll ──────────────────────────────
-  let targetScrollY = 0;
-  let currentScrollY = 0;
-  const ease = 0.055; /* heavier inertia = more cinematic weight */
+  // ─── Discrete Hero Step Scroll ──────────────────────────
+  let heroStep        = 0;       // 0=house1 1=house2 2=house3
+  let heroLocked      = true;    // captures scroll while in hero
+  let isTransitioning = false;
+  const TRANSITION_MS = 240;
 
-  function lerp(start, end, factor) {
-    return start + (end - start) * factor;
+  function advanceHero(dir) {
+    // dir: +1 = forward (scroll down), -1 = backward (scroll up)
+    if (isTransitioning) return;
+    const next = heroStep + dir;
+
+    if (next < 0) return; // already at first house, ignore scroll-up
+
+    if (next <= 2) {
+      isTransitioning = true;
+      switchHouse(next, dir);
+      heroStep = next;
+      setTimeout(() => { isTransitioning = false; }, TRANSITION_MS);
+    } else {
+      // heroStep was 2, scrolling forward → unlock and release
+      heroLocked = false;
+      heroStep   = 3;
+    }
   }
 
   window.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    targetScrollY += e.deltaY * 0.8;
-    targetScrollY = Math.max(0, Math.min(targetScrollY, document.documentElement.scrollHeight - window.innerHeight));
+    if (heroLocked) {
+      e.preventDefault();
+      if (e.deltaY > 0) advanceHero(+1);
+      else              advanceHero(-1);
+    } else {
+      // Re-lock if user scrolls back to top (hero visible)
+      if (window.scrollY <= 0 && e.deltaY < 0) {
+        heroLocked = true;
+        heroStep   = 2;
+      }
+    }
   }, { passive: false });
 
   // Touch support
@@ -1902,11 +1933,14 @@
   }, { passive: true });
 
   window.addEventListener('touchmove', (e) => {
+    if (!heroLocked) return;
+    e.preventDefault();
     const delta = touchStartY - e.touches[0].clientY;
+    if (Math.abs(delta) < 8) return; // ignore tiny jitter
     touchStartY = e.touches[0].clientY;
-    targetScrollY += delta;
-    targetScrollY = Math.max(0, Math.min(targetScrollY, document.documentElement.scrollHeight - window.innerHeight));
-  }, { passive: true });
+    if (delta > 0) advanceHero(+1);
+    else           advanceHero(-1);
+  }, { passive: false });
 
   // ─── House data ───────────────────────────────────────
   const houseData = [
@@ -1926,14 +1960,16 @@
   const stepsBar     = document.querySelector('.steps-bar');
   let activeHouse    = 0;
 
-  function switchHouse(idx) {
+  function switchHouse(idx, dir = 1) {
     if (idx === activeHouse) return;
+    const exitClass = dir >= 0 ? 'exit-up' : 'exit-down';
     scenes[activeHouse].classList.remove('active');
-    scenes[activeHouse].classList.add('exit');
+    scenes[activeHouse].classList.add(exitClass);
     houseDots[activeHouse].classList.remove('active');
     trackDots[activeHouse].classList.remove('active');
     const prev = activeHouse;
-    setTimeout(() => scenes[prev] && scenes[prev].classList.remove('exit'), 700);
+    const prevExit = exitClass;
+    setTimeout(() => scenes[prev] && scenes[prev].classList.remove(prevExit), 500);
 
     activeHouse = idx;
     scenes[activeHouse].classList.add('active');
@@ -1941,7 +1977,7 @@
     trackDots[activeHouse].classList.add('active');
 
     [cardName, cardSub, cardSpec].forEach(el => {
-      el.style.transition = 'opacity 0.22s';
+      el.style.transition = 'opacity 0.18s';
       el.style.opacity = '0';
     });
     setTimeout(() => {
@@ -1949,27 +1985,7 @@
       cardSub.textContent  = houseData[idx].sub;
       cardSpec.textContent = houseData[idx].spec;
       [cardName, cardSub, cardSpec].forEach(el => { el.style.opacity = '1'; });
-    }, 220);
-  }
-
-  // ─── Sticky-scroll hero ──────────────────────────────────
-  // hero = 300vh, sticky range = 200vh, 3 houses × ~66vh each
-  function applyParallax(scrollY) {
-    const stickyRange  = heroEl.offsetHeight - window.innerHeight;
-    const heroProgress = Math.max(0, Math.min(scrollY / stickyRange, 1));
-
-    const houseIdx = Math.min(Math.floor(heroProgress * 3), 2);
-    switchHouse(houseIdx);
-
-    // Fade out everything in the final 12% before releasing to next section
-    const exitFade = heroProgress > 0.88 ? 1 - (heroProgress - 0.88) / 0.12 : 1;
-    if (houseWrapper) houseWrapper.style.opacity = Math.max(0, exitFade);
-    if (stepsBar)     stepsBar.style.opacity     = Math.max(0, exitFade);
-
-    // Subtle upward text drift (max 24px) across full hero scroll
-    const drift = heroProgress * -24;
-    document.querySelectorAll('.hero-tag, .hero-headline, .hero-sub, .hero-cta-group')
-      .forEach(el => { el.style.transform = 'translateY(' + drift + 'px)'; });
+    }, 180);
   }
 
   // ─── Word reveals + section reveals ────────────────────────
@@ -1977,12 +1993,10 @@
   const wordReveals = document.querySelectorAll('.word-reveal');
 
   function checkReveal() {
-    // Standard section reveals
     reveals.forEach(el => {
       if (el.getBoundingClientRect().top < window.innerHeight - 60)
         el.classList.add('visible');
     });
-    // Word-by-word headline
     wordReveals.forEach(el => {
       if (el.getBoundingClientRect().top < window.innerHeight - 40)
         el.classList.add('visible');
@@ -1991,10 +2005,6 @@
 
   // ─── Animation loop ─────────────────────────────────────────
   function tick() {
-    currentScrollY = lerp(currentScrollY, targetScrollY, ease);
-    if (Math.abs(currentScrollY - targetScrollY) > 0.1)
-      window.scrollTo(0, currentScrollY);
-    applyParallax(currentScrollY);
     checkReveal();
     updateScrollProgress();
     requestAnimationFrame(tick);
