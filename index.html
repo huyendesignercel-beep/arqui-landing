@@ -496,7 +496,13 @@
       height: clamp(380px, 44vw, 620px);
     }
 
-    /* Each house sits in the same spot; JS fades between them */
+    /* 3D scene — perspective is set here so rotateX/Y look real */
+    .house-wrapper {
+      perspective: 1100px;
+      transform-style: preserve-3d;
+    }
+
+    /* Each house sits in the same spot; JS drives enter/exit */
     .house-scene {
       position: absolute;
       inset: 0;
@@ -504,21 +510,30 @@
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transform: scale(0.94) translateY(18px);
-      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1),
-                  transform 0.7s cubic-bezier(0.16,1,0.3,1);
+      /* Enter-from state: comes up from below with tilt */
+      transform: translateY(70px) scale(0.88) rotateX(14deg);
+      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.85s cubic-bezier(0.16,1,0.3,1);
       pointer-events: none;
+      transform-style: preserve-3d;
     }
 
     .house-scene.active {
       opacity: 1;
-      transform: scale(1) translateY(0px);
+      transform: translateY(0px) scale(1) rotateX(0deg);
       pointer-events: auto;
+      animation: house-breathe 7s ease-in-out infinite;
     }
 
+    /* Exit-to state: floats up and tilts back into distance */
     .house-scene.exit {
       opacity: 0;
-      transform: scale(1.04) translateY(-12px);
+      transform: translateY(-50px) scale(1.06) rotateX(-10deg);
+    }
+
+    @keyframes house-breathe {
+      0%,100% { transform: translateY(0px)  scale(1)    rotateX(0deg); }
+      50%      { transform: translateY(-14px) scale(1.01) rotateX(1.5deg); }
     }
 
     .house-img {
@@ -530,12 +545,6 @@
         drop-shadow(0px 50px 36px rgba(0,0,0,0.16))
         drop-shadow(0px 16px 14px rgba(0,0,0,0.10))
         drop-shadow(0px 3px  5px  rgba(0,0,0,0.07));
-      animation: house-float 6s ease-in-out infinite;
-    }
-
-    @keyframes house-float {
-      0%,100% { transform: translateY(0px); }
-      50%      { transform: translateY(-12px); }
     }
 
     /* Ground shadow */
@@ -1072,64 +1081,109 @@
       margin-bottom: 56px;
     }
 
-    .gallery-row {
+    /* ─── Marquee rows ──────────────────────────────────── */
+    .marquee-wrap {
       display: flex;
-      gap: 20px;
-      padding: 0 48px;
+      flex-direction: column;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 16px;
+      width: max-content;
+      /* pause on hover */
+    }
+
+    .marquee-track.left  { animation: marquee-left  28s linear infinite; }
+    .marquee-track.right { animation: marquee-right 32s linear infinite; }
+
+    .marquee-wrap:hover .marquee-track { animation-play-state: paused; }
+
+    @keyframes marquee-left {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes marquee-right {
+      from { transform: translateX(-50%); }
+      to   { transform: translateX(0); }
     }
 
     .gallery-item {
       flex-shrink: 0;
-      border-radius: 16px;
+      border-radius: 20px;
       overflow: hidden;
-      border: 1px solid var(--gray-100);
+      background: var(--gray-50);
       position: relative;
+      cursor: none;
     }
 
     .gallery-item-img {
       display: block;
-      height: 300px;
+      height: 240px;
       width: auto;
       object-fit: contain;
-      padding: 16px;
+      padding: 20px;
       filter:
         drop-shadow(0 20px 24px rgba(0,0,0,0.12))
         drop-shadow(0 4px 8px rgba(0,0,0,0.07));
-      transition: transform 0.6s var(--ease-out-expo), filter 0.4s;
+      transition: transform 0.7s var(--ease-out-expo), filter 0.4s;
     }
 
     .gallery-item:hover .gallery-item-img {
-      transform: scale(1.04);
+      transform: scale(1.06) translateY(-6px);
       filter:
-        drop-shadow(0 28px 32px rgba(0,0,0,0.16))
-        drop-shadow(0 6px 12px rgba(0,0,0,0.09));
+        drop-shadow(0 32px 36px rgba(0,0,0,0.17))
+        drop-shadow(0 8px 14px rgba(0,0,0,0.09));
     }
 
     .gallery-item-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 50%);
+      background: linear-gradient(to top, rgba(0,0,0,0.25) 0%, transparent 55%);
       opacity: 0;
       transition: opacity 0.3s;
+      border-radius: 20px;
     }
 
     .gallery-item:hover .gallery-item-overlay { opacity: 1; }
 
     .gallery-item-caption {
       position: absolute;
-      bottom: 16px; left: 18px;
-      font-size: 12px;
+      bottom: 14px; left: 16px;
+      font-size: 11px;
       font-weight: 300;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       color: white;
       opacity: 0;
       transform: translateY(6px);
-      transition: opacity 0.3s, transform 0.3s var(--ease-out-expo);
+      transition: opacity 0.3s, transform 0.35s var(--ease-out-expo);
     }
 
     .gallery-item:hover .gallery-item-caption {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    /* ─── Word-by-word headline reveal ──────────────────── */
+    .word-reveal {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+
+    .word-reveal .word-inner {
+      display: inline-block;
+      transform: translateY(110%);
+      opacity: 0;
+      transition: transform 1s var(--ease-out-expo), opacity 0.6s ease;
+    }
+
+    .word-reveal.visible .word-inner {
+      transform: translateY(0%);
+      opacity: 1;
     }
 
     /* ─── CTA Section ───────────────────────────────────── */
@@ -1434,9 +1488,15 @@
         <span class="hero-tag-text"><strong>+10,000</strong> spaces connected worldwide</span>
       </div>
 
-      <h1 class="hero-headline page-enter page-enter-delay-2">
-        Design <em>Your Space</em>
-        <span class="line-2">The Smart Way</span>
+      <h1 class="hero-headline" id="heroHeadline">
+        <span class="word-reveal" style="transition-delay:0.05s"><span class="word-inner">Design</span></span>
+        <span class="word-reveal" style="transition-delay:0.18s"><span class="word-inner"><em>Your</em></span></span>
+        <span class="word-reveal" style="transition-delay:0.31s"><span class="word-inner"><em>Space</em></span></span>
+        <span class="line-2">
+          <span class="word-reveal" style="transition-delay:0.44s"><span class="word-inner">The</span></span>
+          <span class="word-reveal" style="transition-delay:0.57s"><span class="word-inner">Smart</span></span>
+          <span class="word-reveal" style="transition-delay:0.70s"><span class="word-inner">Way</span></span>
+        </span>
       </h1>
 
       <p class="hero-sub page-enter page-enter-delay-3">
@@ -1713,32 +1773,43 @@
       Every home<br/>tells a <em>story</em>
     </h2>
   </div>
-  <div class="gallery-row" id="galleryRow">
-    <div class="gallery-item" style="width:340px">
-      <img src="0dad04faf7e5c30355d73f238a2c91cf%201.svg" alt="Modern Villa" class="gallery-item-img" />
-      <div class="gallery-item-overlay"></div>
-      <div class="gallery-item-caption">Villa Lumière · Paris</div>
+  <!-- Two auto-scrolling marquee rows — opposite directions -->
+  <div class="marquee-wrap reveal">
+
+    <!-- Row 1 → scrolls left. Items duplicated for seamless loop -->
+    <div class="marquee-track left">
+      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Barcelona</div></div>
+      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · Paris</div></div>
+      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Lyon</div></div>
+      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Tokyo</div></div>
+      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Arc · Seoul</div></div>
+      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Milan</div></div>
+      <!-- duplicate for seamless -->
+      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Barcelona</div></div>
+      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · Paris</div></div>
+      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Lyon</div></div>
+      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Tokyo</div></div>
+      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Arc · Seoul</div></div>
+      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Milan</div></div>
     </div>
-    <div class="gallery-item" style="width:260px">
-      <img src="d992b40a285997b183acc9d385ead881%201.svg" alt="Eco House" class="gallery-item-img" />
-      <div class="gallery-item-overlay"></div>
-      <div class="gallery-item-caption">Maison Verte · Lyon</div>
+
+    <!-- Row 2 → scrolls right -->
+    <div class="marquee-track right">
+      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Amsterdam</div></div>
+      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Madrid</div></div>
+      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · Berlin</div></div>
+      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Sydney</div></div>
+      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Dubai</div></div>
+      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · NYC</div></div>
+      <!-- duplicate -->
+      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Amsterdam</div></div>
+      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Madrid</div></div>
+      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · Berlin</div></div>
+      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Sydney</div></div>
+      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Dubai</div></div>
+      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · NYC</div></div>
     </div>
-    <div class="gallery-item" style="width:300px">
-      <img src="fb04995f51dfedac14da052a3b00529d%201.svg" alt="Casa Noir" class="gallery-item-img" />
-      <div class="gallery-item-overlay"></div>
-      <div class="gallery-item-caption">Casa Noir · Barcelona</div>
-    </div>
-    <div class="gallery-item" style="width:340px">
-      <img src="0dad04faf7e5c30355d73f238a2c91cf%201.svg" alt="Modern Villa" class="gallery-item-img" />
-      <div class="gallery-item-overlay"></div>
-      <div class="gallery-item-caption">Villa Arc · Tokyo</div>
-    </div>
-    <div class="gallery-item" style="width:260px">
-      <img src="d992b40a285997b183acc9d385ead881%201.svg" alt="Eco House" class="gallery-item-img" />
-      <div class="gallery-item-overlay"></div>
-      <div class="gallery-item-caption">Maison Verte · Seoul</div>
-    </div>
+
   </div>
 </section>
 
@@ -1812,7 +1883,7 @@
   // ─── Smooth Inertia Scroll ──────────────────────────────
   let targetScrollY = 0;
   let currentScrollY = 0;
-  const ease = 0.07;
+  const ease = 0.055; /* heavier inertia = more cinematic weight */
 
   function lerp(start, end, factor) {
     return start + (end - start) * factor;
@@ -1901,16 +1972,24 @@
       .forEach(el => { el.style.transform = 'translateY(' + drift + 'px)'; });
   }
 
-  // ─── Reveal on scroll ───────────────────────────────────────
-  const reveals = document.querySelectorAll('.reveal');
+  // ─── Word reveals + section reveals ────────────────────────
+  const reveals     = document.querySelectorAll('.reveal');
+  const wordReveals = document.querySelectorAll('.word-reveal');
+
   function checkReveal() {
+    // Standard section reveals
     reveals.forEach(el => {
-      if (el.getBoundingClientRect().top < window.innerHeight - 80)
+      if (el.getBoundingClientRect().top < window.innerHeight - 60)
+        el.classList.add('visible');
+    });
+    // Word-by-word headline
+    wordReveals.forEach(el => {
+      if (el.getBoundingClientRect().top < window.innerHeight - 40)
         el.classList.add('visible');
     });
   }
 
-  // ─── Animation loop ──────────────────────────────────────────
+  // ─── Animation loop ─────────────────────────────────────────
   function tick() {
     currentScrollY = lerp(currentScrollY, targetScrollY, ease);
     if (Math.abs(currentScrollY - targetScrollY) > 0.1)
@@ -1922,41 +2001,35 @@
   }
   tick();
 
-  // ─── Gallery drag-scroll ────────────────────────────────────
-  const galleryRow = document.getElementById('galleryRow');
-  let isDown = false, startX, scrollLeft;
-  galleryRow.addEventListener('mousedown', e => {
-    isDown = true;
-    startX = e.pageX - galleryRow.offsetLeft;
-    scrollLeft = galleryRow.scrollLeft;
-  });
-  galleryRow.addEventListener('mouseleave', () => { isDown = false; });
-  galleryRow.addEventListener('mouseup',    () => { isDown = false; });
-  galleryRow.addEventListener('mousemove',  e => {
-    if (!isDown) return;
-    e.preventDefault();
-    galleryRow.scrollLeft = scrollLeft - (e.pageX - galleryRow.offsetLeft - startX) * 1.5;
-  });
-
-  // ─── Mouse tilt on active house ──────────────────────────────
+  // ─── Mouse tilt on active house ─────────────────────────────
   const heroSticky = document.getElementById('heroSticky');
   heroSticky.addEventListener('mousemove', e => {
     const r  = heroSticky.getBoundingClientRect();
     const mx = (e.clientX - r.width  / 2) / (r.width  / 2);
     const my = (e.clientY - r.height / 2) / (r.height / 2);
-    const img = houseWrapper && houseWrapper.querySelector('.house-scene.active img');
-    if (img) img.style.transform = 'translateY(-10px) rotateX(' + (my * -2) + 'deg) rotateY(' + (mx * 3) + 'deg)';
+    const scene = houseWrapper && houseWrapper.querySelector('.house-scene.active');
+    if (scene) {
+      scene.style.transform =
+        'translateY(0px) scale(1) rotateX(' + (my * -3) + 'deg) rotateY(' + (mx * 4) + 'deg)';
+    }
   });
   heroSticky.addEventListener('mouseleave', () => {
-    const img = houseWrapper && houseWrapper.querySelector('.house-scene.active img');
-    if (img) { img.style.transform = ''; img.style.transition = 'transform 0.7s cubic-bezier(0.16,1,0.3,1)'; }
+    const scene = houseWrapper && houseWrapper.querySelector('.house-scene.active');
+    if (scene) {
+      scene.style.transform = '';
+      scene.style.transition = 'transform 1s cubic-bezier(0.16,1,0.3,1)';
+      setTimeout(() => { if (scene) scene.style.transition = ''; }, 1000);
+    }
   });
+
+  // ─── Init ───────────────────────────────────────────────────
+  // Trigger headline on load immediately
+  setTimeout(() => {
+    wordReveals.forEach(el => el.classList.add('visible'));
+  }, 300);
 
   checkReveal();
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
