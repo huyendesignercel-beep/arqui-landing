@@ -477,8 +477,6 @@
       display: block;
       position: relative;
       z-index: 2;
-      /* mix-blend-mode:multiply erases white pixels on a white background */
-      mix-blend-mode: multiply;
       /* sharp drop-shadow gives real 3D presence */
       filter:
         drop-shadow(0px 60px 40px rgba(0,0,0,0.18))
@@ -900,10 +898,9 @@
     .showcase-house-img {
       width: 100%;
       height: auto;
-      mix-blend-mode: lighten;
       filter:
-        drop-shadow(0 40px 40px rgba(255,255,255,0.06))
-        drop-shadow(0 8px 16px rgba(255,255,255,0.04));
+        drop-shadow(0 40px 50px rgba(255,255,255,0.08))
+        drop-shadow(0 8px 20px rgba(255,255,255,0.06));
     }
 
     .showcase-stats {
@@ -1033,8 +1030,8 @@
       display: block;
       height: 300px;
       width: auto;
-      object-fit: cover;
-      mix-blend-mode: multiply;
+      object-fit: contain;
+      padding: 16px;
       filter:
         drop-shadow(0 20px 24px rgba(0,0,0,0.12))
         drop-shadow(0 4px 8px rgba(0,0,0,0.07));
@@ -1406,7 +1403,7 @@
       <div class="house-wrapper" id="houseWrapper">
         <div class="house-scene">
           <img
-            src="fb04995f51dfedac14da052a3b00529d.jpg"
+            src="fb04995f51dfedac14da052a3b00529d%201.png"
             alt="Modern Architecture 3D Model"
             class="house-img"
             id="houseImg"
@@ -1597,7 +1594,7 @@
 
     <div class="showcase-house reveal reveal-delay-2">
       <img
-        src="fb04995f51dfedac14da052a3b00529d.jpg"
+        src="fb04995f51dfedac14da052a3b00529d%201.png"
         alt="Casa Noir — Contemporary Architecture"
         class="showcase-house-img"
       />
@@ -1634,29 +1631,29 @@
   </div>
   <div class="gallery-row" id="galleryRow">
     <div class="gallery-item" style="width:340px">
-      <img src="0dad04faf7e5c30355d73f238a2c91cf.jpg" alt="Modern Villa" class="gallery-item-img" />
+      <img src="0dad04faf7e5c30355d73f238a2c91cf%201.png" alt="Modern Villa" class="gallery-item-img" />
       <div class="gallery-item-overlay"></div>
       <div class="gallery-item-caption">Villa Lumière · Paris</div>
     </div>
     <div class="gallery-item" style="width:260px">
-      <img src="d992b40a285997b183acc9d385ead881.jpg" alt="Eco House" class="gallery-item-img" />
+      <img src="d992b40a285997b183acc9d385ead881%201.png" alt="Eco House" class="gallery-item-img" />
       <div class="gallery-item-overlay"></div>
       <div class="gallery-item-caption">Maison Verte · Lyon</div>
     </div>
     <div class="gallery-item" style="width:300px">
-      <img src="fc76bf354a1545c937c02e44080a9dc3.jpg" alt="White Minimal House" class="gallery-item-img" />
-      <div class="gallery-item-overlay"></div>
-      <div class="gallery-item-caption">Casa Bianca · Milan</div>
-    </div>
-    <div class="gallery-item" style="width:340px">
-      <img src="fb04995f51dfedac14da052a3b00529d.jpg" alt="Dark House" class="gallery-item-img" />
+      <img src="fb04995f51dfedac14da052a3b00529d%201.png" alt="Casa Noir" class="gallery-item-img" />
       <div class="gallery-item-overlay"></div>
       <div class="gallery-item-caption">Casa Noir · Barcelona</div>
     </div>
-    <div class="gallery-item" style="width:260px">
-      <img src="0dad04faf7e5c30355d73f238a2c91cf.jpg" alt="Modern Villa 2" class="gallery-item-img" />
+    <div class="gallery-item" style="width:340px">
+      <img src="0dad04faf7e5c30355d73f238a2c91cf%201.png" alt="Modern Villa" class="gallery-item-img" />
       <div class="gallery-item-overlay"></div>
       <div class="gallery-item-caption">Villa Arc · Tokyo</div>
+    </div>
+    <div class="gallery-item" style="width:260px">
+      <img src="d992b40a285997b183acc9d385ead881%201.png" alt="Eco House" class="gallery-item-img" />
+      <div class="gallery-item-overlay"></div>
+      <div class="gallery-item-caption">Maison Verte · Seoul</div>
     </div>
   </div>
 </section>
