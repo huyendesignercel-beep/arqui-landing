@@ -227,15 +227,23 @@
 
     .nav-menu-btn:hover span { width: 20px; }
 
-    /* ─── Hero Section ──────────────────────────────────── */
+    /* ─── Hero Section — tall scroll driver ─────────────── */
     .hero {
       position: relative;
       width: 100%;
+      height: 300vh; /* 3 houses × 100vh each */
+    }
+
+    /* The sticky frame — stays at top while hero scrolls */
+    .hero-sticky {
+      position: sticky;
+      top: 0;
+      width: 100%;
       height: 100vh;
       min-height: 700px;
+      overflow: hidden;
       display: flex;
       align-items: center;
-      overflow: hidden;
     }
 
     .hero-bg {
@@ -267,6 +275,30 @@
       align-items: center;
       gap: 40px;
       padding-top: 72px;
+    }
+
+    /* Scroll progress bar inside hero */
+    .hero-scroll-track {
+      position: absolute;
+      right: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 20;
+    }
+
+    .hero-track-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--gray-300);
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .hero-track-dot.active {
+      background: var(--black);
+      transform: scale(1.6);
     }
 
     /* ─── Left Text Column ──────────────────────────────── */
@@ -1366,8 +1398,16 @@
 
 <!-- ─── Hero ───────────────────────────────────────────── -->
 <section class="hero" id="hero">
+  <div class="hero-sticky" id="heroSticky">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
+
+  <!-- Side progress dots -->
+  <div class="hero-scroll-track">
+    <div class="hero-track-dot active" id="trackDot0"></div>
+    <div class="hero-track-dot" id="trackDot1"></div>
+    <div class="hero-track-dot" id="trackDot2"></div>
+  </div>
 
   <div class="hero-content">
 
@@ -1532,6 +1572,7 @@
       </div>
     </div>
   </div>
+  </div><!-- /hero-sticky -->
 </section>
 
 <!-- ─── Features ───────────────────────────────────────── -->
@@ -1796,46 +1837,40 @@
     targetScrollY = Math.max(0, Math.min(targetScrollY, document.documentElement.scrollHeight - window.innerHeight));
   }, { passive: true });
 
-  // ─── House data for card updates ────────────────────────
+  // ─── House data ───────────────────────────────────────
   const houseData = [
-    { name: 'Casa Noir',      sub: 'Contemporary Residence · 2024', spec: '4 Bed · 3 Bath · 420m²' },
-    { name: 'Villa Lumière',  sub: 'Modern Villa · 2023',           spec: '5 Bed · 4 Bath · 560m²' },
-    { name: 'Maison Verte',   sub: 'Eco Residence · 2024',          spec: '3 Bed · 2 Bath · 310m²' },
+    { name: 'Casa Noir',     sub: 'Contemporary Residence · 2024', spec: '4 Bed · 3 Bath · 420m²' },
+    { name: 'Villa Lumière', sub: 'Modern Villa · 2023',           spec: '5 Bed · 4 Bath · 560m²' },
+    { name: 'Maison Verte',  sub: 'Eco Residence · 2024',          spec: '3 Bed · 2 Bath · 310m²' },
   ];
 
-  const houseWrapper  = document.getElementById('houseWrapper');
-  const heroTag       = document.querySelector('.hero-tag');
-  const heroHeadline  = document.querySelector('.hero-headline');
-  const heroSub       = document.querySelector('.hero-sub');
-  const heroCTA       = document.querySelector('.hero-cta-group');
-  const stepsBar      = document.querySelector('.steps-bar');
-  const cardName      = document.getElementById('cardName');
-  const cardSub       = document.getElementById('cardSub');
-  const cardSpec      = document.getElementById('cardSpec');
-  const scenes        = document.querySelectorAll('.house-scene');
-  const dots          = document.querySelectorAll('.house-dot');
-
-  // Each house gets its own scroll "band": 0–250px, 250–500px, 500–750px
-  const BAND = 260;
-  let activeHouse = 0;
+  const heroEl       = document.getElementById('hero');
+  const houseWrapper = document.getElementById('houseWrapper');
+  const cardName     = document.getElementById('cardName');
+  const cardSub      = document.getElementById('cardSub');
+  const cardSpec     = document.getElementById('cardSpec');
+  const scenes       = document.querySelectorAll('.house-scene');
+  const houseDots    = document.querySelectorAll('.house-dot');
+  const trackDots    = [0,1,2].map(i => document.getElementById('trackDot' + i));
+  const stepsBar     = document.querySelector('.steps-bar');
+  let activeHouse    = 0;
 
   function switchHouse(idx) {
     if (idx === activeHouse) return;
-    // Exit current
     scenes[activeHouse].classList.remove('active');
     scenes[activeHouse].classList.add('exit');
-    dots[activeHouse].classList.remove('active');
-    setTimeout(() => scenes[activeHouse].classList.remove('exit'), 700);
+    houseDots[activeHouse].classList.remove('active');
+    trackDots[activeHouse].classList.remove('active');
+    const prev = activeHouse;
+    setTimeout(() => scenes[prev] && scenes[prev].classList.remove('exit'), 700);
 
     activeHouse = idx;
-
-    // Enter new
     scenes[activeHouse].classList.add('active');
-    dots[activeHouse].classList.add('active');
+    houseDots[activeHouse].classList.add('active');
+    trackDots[activeHouse].classList.add('active');
 
-    // Swap card text with a quick fade
     [cardName, cardSub, cardSpec].forEach(el => {
-      el.style.transition = 'opacity 0.25s';
+      el.style.transition = 'opacity 0.22s';
       el.style.opacity = '0';
     });
     setTimeout(() => {
@@ -1843,126 +1878,85 @@
       cardSub.textContent  = houseData[idx].sub;
       cardSpec.textContent = houseData[idx].spec;
       [cardName, cardSub, cardSpec].forEach(el => { el.style.opacity = '1'; });
-    }, 250);
+    }, 220);
   }
 
+  // ─── Sticky-scroll hero ──────────────────────────────────
+  // hero = 300vh, sticky range = 200vh, 3 houses × ~66vh each
   function applyParallax(scrollY) {
-    const heroHeight = document.querySelector('.hero').offsetHeight;
-    const progress = Math.min(scrollY / heroHeight, 1);
+    const stickyRange  = heroEl.offsetHeight - window.innerHeight;
+    const heroProgress = Math.max(0, Math.min(scrollY / stickyRange, 1));
 
-    // House cycling — switch every BAND pixels of scroll
-    const houseIdx = Math.min(Math.floor(scrollY / BAND), 2);
+    const houseIdx = Math.min(Math.floor(heroProgress * 3), 2);
     switchHouse(houseIdx);
 
-    // House wrapper: push up + fade as you leave hero
-    if (houseWrapper) {
-      const houseY = -scrollY * 0.38;
-      const houseScale = 1 - progress * 0.14;
-      const houseOpacity = 1 - progress * 1.1;
-      houseWrapper.style.transform = `translateY(${houseY}px) scale(${houseScale})`;
-      houseWrapper.style.opacity = Math.max(0, houseOpacity);
-    }
+    // Fade out everything in the final 12% before releasing to next section
+    const exitFade = heroProgress > 0.88 ? 1 - (heroProgress - 0.88) / 0.12 : 1;
+    if (houseWrapper) houseWrapper.style.opacity = Math.max(0, exitFade);
+    if (stepsBar)     stepsBar.style.opacity     = Math.max(0, exitFade);
 
-    // Text layers — each at a slightly different speed (parallax depth)
-    if (heroTag) {
-      heroTag.style.transform = `translateY(${scrollY * 0.12}px)`;
-      heroTag.style.opacity   = Math.max(0, 1 - progress * 3);
-    }
-    if (heroHeadline) {
-      heroHeadline.style.transform = `translateY(${scrollY * 0.22}px)`;
-      heroHeadline.style.opacity   = Math.max(0, 1 - progress * 2);
-    }
-    if (heroSub) {
-      heroSub.style.transform = `translateY(${scrollY * 0.30}px)`;
-      heroSub.style.opacity   = Math.max(0, 1 - progress * 2.5);
-    }
-    if (heroCTA) {
-      heroCTA.style.transform = `translateY(${scrollY * 0.38}px)`;
-      heroCTA.style.opacity   = Math.max(0, 1 - progress * 3);
-    }
-    if (stepsBar) {
-      stepsBar.style.opacity = Math.max(0, 1 - progress * 4);
-    }
+    // Subtle upward text drift (max 24px) across full hero scroll
+    const drift = heroProgress * -24;
+    document.querySelectorAll('.hero-tag, .hero-headline, .hero-sub, .hero-cta-group')
+      .forEach(el => { el.style.transform = 'translateY(' + drift + 'px)'; });
   }
 
-  // ─── Reveal on scroll ───────────────────────────────────
+  // ─── Reveal on scroll ───────────────────────────────────────
   const reveals = document.querySelectorAll('.reveal');
-
-  function checkReveal(scrollY) {
+  function checkReveal() {
     reveals.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      const offset = scrollY - window.scrollY + rect.top;
-      if (scrollY + window.innerHeight > offset + 80) {
+      if (el.getBoundingClientRect().top < window.innerHeight - 80)
         el.classList.add('visible');
-      }
     });
   }
 
-  // ─── Animation Loop ─────────────────────────────────────
+  // ─── Animation loop ──────────────────────────────────────────
   function tick() {
     currentScrollY = lerp(currentScrollY, targetScrollY, ease);
-
-    if (Math.abs(currentScrollY - targetScrollY) > 0.1) {
+    if (Math.abs(currentScrollY - targetScrollY) > 0.1)
       window.scrollTo(0, currentScrollY);
-    }
-
     applyParallax(currentScrollY);
-    checkReveal(currentScrollY);
+    checkReveal();
     updateScrollProgress();
-
     requestAnimationFrame(tick);
   }
-
   tick();
 
-  // ─── Gallery drag-scroll ────────────────────────────────
+  // ─── Gallery drag-scroll ────────────────────────────────────
   const galleryRow = document.getElementById('galleryRow');
-  let isDown = false;
-  let startX;
-  let scrollLeft;
-
-  galleryRow.addEventListener('mousedown', (e) => {
+  let isDown = false, startX, scrollLeft;
+  galleryRow.addEventListener('mousedown', e => {
     isDown = true;
-    galleryRow.style.cursor = 'grabbing';
     startX = e.pageX - galleryRow.offsetLeft;
     scrollLeft = galleryRow.scrollLeft;
   });
-  galleryRow.addEventListener('mouseleave', () => { isDown = false; galleryRow.style.cursor = 'default'; });
-  galleryRow.addEventListener('mouseup', () => { isDown = false; galleryRow.style.cursor = 'default'; });
-  galleryRow.addEventListener('mousemove', (e) => {
+  galleryRow.addEventListener('mouseleave', () => { isDown = false; });
+  galleryRow.addEventListener('mouseup',    () => { isDown = false; });
+  galleryRow.addEventListener('mousemove',  e => {
     if (!isDown) return;
     e.preventDefault();
-    const x = e.pageX - galleryRow.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    galleryRow.scrollLeft = scrollLeft - walk;
+    galleryRow.scrollLeft = scrollLeft - (e.pageX - galleryRow.offsetLeft - startX) * 1.5;
   });
 
-  // ─── Subtle mouse tilt on the active house scene ────────
-  const heroSection = document.getElementById('hero');
-
-  heroSection.addEventListener('mousemove', (e) => {
-    if (!houseWrapper) return;
-    const rect = heroSection.getBoundingClientRect();
-    const moveX = (e.clientX - rect.width / 2)  / (rect.width  / 2);
-    const moveY = (e.clientY - rect.height / 2) / (rect.height / 2);
-    const active = houseWrapper.querySelector('.house-scene.active img');
-    if (active) {
-      active.style.transform = `translateY(-12px) rotateX(${moveY * -2}deg) rotateY(${moveX * 3}deg)`;
-      active.style.transition = 'transform 0.15s ease-out';
-    }
+  // ─── Mouse tilt on active house ──────────────────────────────
+  const heroSticky = document.getElementById('heroSticky');
+  heroSticky.addEventListener('mousemove', e => {
+    const r  = heroSticky.getBoundingClientRect();
+    const mx = (e.clientX - r.width  / 2) / (r.width  / 2);
+    const my = (e.clientY - r.height / 2) / (r.height / 2);
+    const img = houseWrapper && houseWrapper.querySelector('.house-scene.active img');
+    if (img) img.style.transform = 'translateY(-10px) rotateX(' + (my * -2) + 'deg) rotateY(' + (mx * 3) + 'deg)';
+  });
+  heroSticky.addEventListener('mouseleave', () => {
+    const img = houseWrapper && houseWrapper.querySelector('.house-scene.active img');
+    if (img) { img.style.transform = ''; img.style.transition = 'transform 0.7s cubic-bezier(0.16,1,0.3,1)'; }
   });
 
-  heroSection.addEventListener('mouseleave', () => {
-    const active = houseWrapper.querySelector('.house-scene.active img');
-    if (active) {
-      active.style.transform = '';
-      active.style.transition = 'transform 0.7s cubic-bezier(0.16,1,0.3,1)';
-    }
-  });
-
-  // ─── Initialize reveals ─────────────────────────────────
-  checkReveal(0);
+  checkReveal();
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
