@@ -507,51 +507,37 @@
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transform: scale(0.92);
-      transition: none;
+      transform: translateY(48px) scale(0.93);
+      transition: opacity 0.22s cubic-bezier(0.25, 1, 0.35, 1),
+                  transform 0.26s cubic-bezier(0.25, 1, 0.35, 1);
       pointer-events: none;
       transform-style: preserve-3d;
     }
 
     .house-scene.active {
       opacity: 1;
-      transform: scale(1);
+      transform: translateY(0px) scale(1);
       pointer-events: auto;
       animation: house-breathe 7s ease-in-out infinite;
     }
 
-    /* 360° cinematic exit — house rotates away with depth compression */
-    @keyframes house-rotate-exit {
-      0%   { opacity: 1;   transform: rotateY(0deg)   scale(1);    filter: blur(0px); }
-      18%  { opacity: 1;   transform: rotateY(65deg)  scale(0.94); filter: blur(0.5px); }
-      45%  { opacity: 0.6; transform: rotateY(162deg) scale(0.87); filter: blur(1.5px); }
-      72%  { opacity: 0.15; transform: rotateY(278deg) scale(0.9); filter: blur(2px); }
-      100% { opacity: 0;   transform: rotateY(360deg) scale(0.91); filter: blur(0px); }
+    .house-scene.exit-up {
+      opacity: 0;
+      transform: translateY(-44px) scale(1.05);
+      transition: opacity 0.2s cubic-bezier(0.4, 0, 1, 1),
+                  transform 0.24s cubic-bezier(0.4, 0, 1, 1);
     }
 
-    /* Atmospheric entry — house arrives from slight Y-angle, blooms into place */
-    @keyframes house-rotate-enter {
-      0%   { opacity: 0;   transform: rotateY(-22deg) scale(0.91); filter: blur(2px); }
-      28%  { opacity: 0.45; transform: rotateY(-9deg) scale(0.95);  filter: blur(1px); }
-      65%  { opacity: 0.85; transform: rotateY(2deg)  scale(0.99);  filter: blur(0px); }
-      100% { opacity: 1;   transform: rotateY(0deg)   scale(1);    filter: blur(0px); }
+    .house-scene.exit-down {
+      opacity: 0;
+      transform: translateY(44px) scale(1.05);
+      transition: opacity 0.2s cubic-bezier(0.4, 0, 1, 1),
+                  transform 0.24s cubic-bezier(0.4, 0, 1, 1);
     }
 
-    /* Steady float once active */
     @keyframes house-breathe {
       0%,100% { transform: translateY(0px) scale(1); }
       50%      { transform: translateY(-12px) scale(1.01); }
-    }
-
-    .house-scene.rotating-out {
-      animation: house-rotate-exit 1.35s cubic-bezier(0.4, 0, 0.55, 1) forwards;
-      pointer-events: none;
-    }
-
-    /* rotating-in overrides the breathe on .active during entry */
-    .house-scene.active.rotating-in {
-      animation: house-rotate-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      pointer-events: none;
     }
 
     .house-img {
@@ -1902,7 +1888,7 @@
   let heroStep        = 0;       // 0=house1 1=house2 2=house3
   let heroLocked      = true;    // captures scroll while in hero
   let isTransitioning = false;
-  const TRANSITION_MS = 1450; // full 360° exit (1.35s) + entry overlap
+  const TRANSITION_MS = 240;
 
   function advanceHero(dir) {
     // dir: +1 = forward (scroll down), -1 = backward (scroll up)
@@ -1973,43 +1959,30 @@
 
   function switchHouse(idx, dir = 1) {
     if (idx === activeHouse) return;
-    const prev     = activeHouse;
-    activeHouse    = idx;
+    const exitClass = dir >= 0 ? 'exit-up' : 'exit-down';
+    scenes[activeHouse].classList.remove('active');
+    scenes[activeHouse].classList.add(exitClass);
+    houseDots[activeHouse].classList.remove('active');
+    trackDots[activeHouse].classList.remove('active');
+    const prev = activeHouse;
+    const prevExit = exitClass;
+    setTimeout(() => scenes[prev] && scenes[prev].classList.remove(prevExit), 500);
 
-    // ── Exit: spin the outgoing house away ──
-    scenes[prev].classList.remove('active');
-    scenes[prev].classList.add('rotating-out');
-    houseDots[prev].classList.remove('active');
-    trackDots[prev].classList.remove('active');
+    activeHouse = idx;
+    scenes[activeHouse].classList.add('active');
+    houseDots[activeHouse].classList.add('active');
+    trackDots[activeHouse].classList.add('active');
 
-    // ── Text: fade out, then crossfade new labels at midpoint ──
     [cardName, cardSub, cardSpec].forEach(el => {
-      el.style.transition = 'opacity 0.28s cubic-bezier(0.4,0,0.6,1)';
-      el.style.opacity    = '0';
+      el.style.transition = 'opacity 0.18s';
+      el.style.opacity = '0';
     });
     setTimeout(() => {
       cardName.textContent = houseData[idx].name;
       cardSub.textContent  = houseData[idx].sub;
       cardSpec.textContent = houseData[idx].spec;
-      [cardName, cardSub, cardSpec].forEach(el => {
-        el.style.transition = 'opacity 0.4s cubic-bezier(0.16,1,0.3,1)';
-        el.style.opacity    = '1';
-      });
-    }, 660);
-
-    // ── Entry: next house blooms in at 650ms (overlaps exit tail) ──
-    setTimeout(() => {
-      houseDots[idx].classList.add('active');
-      trackDots[idx].classList.add('active');
-      scenes[idx].classList.add('active');
-      scenes[idx].classList.add('rotating-in');
-    }, 650);
-
-    // ── Cleanup: remove animation classes, restore breathe ──
-    setTimeout(() => {
-      scenes[prev].classList.remove('rotating-out');
-      scenes[idx].classList.remove('rotating-in');
-    }, 1600);
+      [cardName, cardSub, cardSpec].forEach(el => { el.style.opacity = '1'; });
+    }, 180);
   }
 
   // ─── Word reveals + section reveals ────────────────────────
@@ -2042,8 +2015,7 @@
     const mx = (e.clientX - r.width  / 2) / (r.width  / 2);
     const my = (e.clientY - r.height / 2) / (r.height / 2);
     const scene = houseWrapper && houseWrapper.querySelector('.house-scene.active');
-    // Skip tilt while rotation animation is running
-    if (scene && !scene.classList.contains('rotating-in') && !scene.classList.contains('rotating-out')) {
+    if (scene) {
       scene.style.transform =
         'translateY(0px) scale(1) rotateX(' + (my * -3) + 'deg) rotateY(' + (mx * 4) + 'deg)';
     }
