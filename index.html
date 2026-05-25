@@ -1949,20 +1949,41 @@
     }
   }, { passive: false });
 
-  // Touch support
-  let touchStartY = 0;
+  // Touch support — horizontal swipe on hero switches houses
+  let touchStartX = 0, touchStartY = 0;
+  let touchDir = null; // 'h' = horizontal, 'v' = vertical
+
   window.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
+    touchDir    = null;
   }, { passive: true });
 
   window.addEventListener('touchmove', (e) => {
-    if (!heroLocked) return;
-    e.preventDefault();
-    const delta = touchStartY - e.touches[0].clientY;
-    if (Math.abs(delta) < 8) return; // ignore tiny jitter
-    touchStartY = e.touches[0].clientY;
-    if (delta > 0) advanceHero(+1);
-    else           advanceHero(-1);
+    const dx = touchStartX - e.touches[0].clientX;
+    const dy = touchStartY - e.touches[0].clientY;
+
+    // Lock direction on first significant move
+    if (!touchDir && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+      touchDir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+    }
+
+    const heroVisible = window.scrollY < window.innerHeight * 0.8;
+
+    if (touchDir === 'h' && heroVisible) {
+      // Horizontal swipe → switch houses (works whether locked or not)
+      e.preventDefault();
+      if (Math.abs(dx) < 30) return;
+      touchStartX = e.touches[0].clientX;
+      if (dx > 0) {
+        // swipe left → next house
+        if (heroStep < 2) { isTransitioning = false; advanceHero(+1); }
+      } else {
+        // swipe right → prev house
+        if (heroStep > 0) { isTransitioning = false; advanceHero(-1); }
+      }
+    }
+    // vertical swipe falls through to normal scroll
   }, { passive: false });
 
   // ─── House data ───────────────────────────────────────
