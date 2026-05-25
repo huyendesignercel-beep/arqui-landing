@@ -113,16 +113,23 @@
       justify-content: space-between;
       border-radius: 100px;
       /* Glass directly on nav */
-      background: rgba(255, 255, 255, 0.18);
-      backdrop-filter: blur(24px) saturate(1.6);
-      -webkit-backdrop-filter: blur(24px) saturate(1.6);
-      border: 1px solid rgba(255, 255, 255, 0.38);
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(24px) saturate(1.8);
+      -webkit-backdrop-filter: blur(24px) saturate(1.8);
+      border: 1px solid rgba(255, 255, 255, 0.6);
       box-shadow:
-        0 2px 16px rgba(0, 0, 0, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        0 2px 20px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
     }
 
     nav::before { display: none; }
+
+    nav.nav-dark {
+      background: rgba(15, 15, 15, 0.55);
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
 
     .nav-logo {
       position: relative;
@@ -131,16 +138,18 @@
       font-size: 15px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.92);
+      color: var(--black);
       text-decoration: none;
       display: flex;
       align-items: center;
       gap: 10px;
     }
+    nav.nav-dark .nav-logo { color: rgba(255,255,255,0.92); }
+    nav.nav-dark .nav-logo-mark { border-color: rgba(255,255,255,0.7); }
 
     .nav-logo-mark {
       width: 28px; height: 28px;
-      border: 1.5px solid rgba(255,255,255,0.7);
+      border: 1.5px solid var(--black);
       border-radius: 6px;
       display: flex;
       align-items: center;
@@ -163,17 +172,24 @@
       font-size: 12px;
       font-weight: 300;
       letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.6);
+      color: var(--gray-500);
       text-decoration: none;
       text-transform: uppercase;
       transition: color 0.2s;
     }
 
-    .nav-links a:hover { color: rgba(255,255,255,1); }
+    .nav-links a:hover { color: var(--black); }
+    nav.nav-dark .nav-links a { color: rgba(255,255,255,0.6); }
+    nav.nav-dark .nav-links a:hover { color: #fff; }
+    nav.nav-dark .nav-separator { background: rgba(255,255,255,0.25); }
+    nav.nav-dark .nav-action-btn { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.12); }
+    nav.nav-dark .nav-action-btn:hover { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.22); }
+    nav.nav-dark .nav-action-btn svg { stroke: rgba(255,255,255,0.8); }
+    nav.nav-dark .nav-menu-btn span { background: rgba(255,255,255,0.85); }
 
     .nav-separator {
       width: 3px; height: 3px;
-      background: rgba(255,255,255,0.3);
+      background: var(--gray-300);
       border-radius: 50%;
     }
 
@@ -187,8 +203,8 @@
     .nav-action-btn {
       width: 32px; height: 32px;
       border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.4);
-      background: rgba(255,255,255,0.25);
+      border: 1px solid var(--gray-200);
+      background: rgba(255,255,255,0.6);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -197,13 +213,13 @@
     }
 
     .nav-action-btn:hover {
-      border-color: rgba(255,255,255,0.7);
-      background: rgba(255,255,255,0.45);
+      border-color: var(--gray-400);
+      background: rgba(255,255,255,0.9);
     }
 
     .nav-action-btn svg {
       width: 14px; height: 14px;
-      stroke: rgba(255,255,255,0.8);
+      stroke: var(--gray-600);
       fill: none;
       stroke-width: 1.5;
     }
@@ -219,7 +235,7 @@
     .nav-menu-btn span {
       display: block;
       height: 1px;
-      background: rgba(255,255,255,0.85);
+      background: var(--black);
       transition: width 0.3s var(--ease-out-expo);
     }
 
@@ -2002,8 +2018,19 @@
     }
   });
 
+  // ─── Nav dark/light auto-switch ────────────────────────────
+  const navEl = document.querySelector('nav');
+  function updateNavTheme() {
+    // Sample the pixel colour behind the nav centre point
+    const navH = navEl.offsetHeight + 18; // top offset
+    // Check if we've scrolled past the hero (100vh)
+    const pastHero = window.scrollY > window.innerHeight * 0.6;
+    navEl.classList.toggle('nav-dark', pastHero);
+  }
+  window.addEventListener('scroll', updateNavTheme, { passive: true });
+  updateNavTheme();
+
   // ─── Init ───────────────────────────────────────────────────
-  // Trigger headline on load immediately
   setTimeout(() => {
     wordReveals.forEach(el => el.classList.add('visible'));
   }, 300);
