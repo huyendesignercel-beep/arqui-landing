@@ -1443,6 +1443,40 @@
       /* Hide house-dots below image (redundant on mobile) */
       .house-dots { display: none; }
 
+      /* ── Gallery: swipe carousel on mobile ── */
+      .gallery { padding: 80px 0 100px; }
+      .gallery-header { padding: 0 24px; margin-bottom: 40px; }
+
+      /* Hide auto-scroll marquee tracks */
+      .mq-wrap { display: block; }
+      .mq-right { display: none; }
+
+      /* Turn left track into a horizontal scroll snap strip */
+      .mq-track.mq-left {
+        animation: none;
+        transform: none !important;
+        overflow-x: scroll;
+        overflow-y: visible;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px 24px 12px;
+        gap: 0;
+      }
+      .mq-track.mq-left::-webkit-scrollbar { display: none; }
+
+      /* Show only first 13 images (originals), hide duplicates */
+      .mq-track.mq-left .gi:nth-child(n+14) { display: none; }
+
+      /* Card size for swipe */
+      .mq-track.mq-left .gi {
+        scroll-snap-align: start;
+        width: 76vw;
+        height: 56vw;
+        margin-right: 12px;
+        flex-shrink: 0;
+      }
+
       /* Footer: stack vertically */
       footer {
         flex-direction: column;
