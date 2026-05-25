@@ -98,30 +98,31 @@
       will-change: transform;
     }
 
-    /* ─── Navigation ────────────────────────────────────── */
+    /* ─── Navigation — floating pill ───────────────────── */
     nav {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 100;
-      padding: 0 48px;
-      height: 72px;
+      padding: 0 28px;
+      height: 54px;
+      width: min(860px, calc(100vw - 48px));
       display: flex;
       align-items: center;
       justify-content: space-between;
+      border-radius: 100px;
+      /* Glass directly on nav */
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(24px) saturate(1.6);
+      -webkit-backdrop-filter: blur(24px) saturate(1.6);
+      border: 1px solid rgba(255, 255, 255, 0.38);
+      box-shadow:
+        0 2px 16px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
     }
 
-    nav::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.82);
-      backdrop-filter: blur(20px) saturate(1.8) brightness(1.05);
-      -webkit-backdrop-filter: blur(20px) saturate(1.8) brightness(1.05);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.7);
-      box-shadow:
-        0 1px 0 rgba(0, 0, 0, 0.05),
-        0 4px 24px rgba(0, 0, 0, 0.04);
-    }
+    nav::before { display: none; }
 
     .nav-logo {
       position: relative;
@@ -184,11 +185,10 @@
     }
 
     .nav-action-btn {
-      width: 36px; height: 36px;
+      width: 32px; height: 32px;
       border-radius: 50%;
-      border: 1px solid var(--gray-200);
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.25);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -197,8 +197,8 @@
     }
 
     .nav-action-btn:hover {
-      border-color: var(--gray-400);
-      background: rgba(255,255,255,0.9);
+      border-color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.45);
     }
 
     .nav-action-btn svg {
