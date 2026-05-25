@@ -1074,10 +1074,10 @@
     }
 
     /* ─── Gallery Row ───────────────────────────────────── */
+    /* ─── Gallery section ─────────────────────────────── */
     .gallery {
       background: var(--white);
       padding: 120px 0 140px;
-      overflow: hidden;
     }
 
     .gallery-header {
@@ -1085,83 +1085,68 @@
       margin-bottom: 64px;
     }
 
-    /* ─── Marquee rows ──────────────────────────────────── */
-    .marquee-wrap {
+    /* Clip rows without touching child transforms */
+    .mq-wrap {
       display: flex;
       flex-direction: column;
       gap: 20px;
       overflow: hidden;
     }
 
-    .marquee-track {
+    /* Each row is a flex strip; items have margin-right for gap */
+    .mq-track {
       display: flex;
       flex-wrap: nowrap;
-      gap: 20px;
-      width: max-content;
       will-change: transform;
     }
 
-    .marquee-track.left  { animation: marquee-left  50s linear infinite; }
-    .marquee-track.right { animation: marquee-right 60s linear infinite; }
+    .mq-left  { animation: mq-go-left  45s linear infinite; }
+    .mq-right { animation: mq-go-right 55s linear infinite; }
 
-    .marquee-wrap:hover .marquee-track { animation-play-state: paused; }
-
-    @keyframes marquee-left {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+    @keyframes mq-go-left  {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
     }
-    @keyframes marquee-right {
-      0%   { transform: translateX(-50%); }
-      100% { transform: translateX(0); }
+    @keyframes mq-go-right {
+      from { transform: translateX(-50%); }
+      to   { transform: translateX(0); }
     }
 
-    /* ── Elegant landscape card ── */
-    .gallery-item {
+    /* Card */
+    .gi {
       flex-shrink: 0;
-      width: 380px;
-      height: 260px;
-      border-radius: 4px;
+      width: 360px;
+      height: 250px;
+      margin-right: 20px;
+      border-radius: 6px;
       overflow: hidden;
       position: relative;
     }
 
-    .gallery-item-img {
+    .gi img {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      /* no scale on hover — stays still, only overlay shifts */
+      pointer-events: none;
     }
 
-    /* Thin gradient at bottom — always on, subtle */
-    .gallery-item-overlay {
+    .gi-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        to top,
-        rgba(8,8,8,0.55) 0%,
-        rgba(8,8,8,0.08) 45%,
-        transparent 70%
-      );
+      background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%);
     }
 
-    /* Caption — always visible */
-    .gallery-item-caption {
+    .gi-caption {
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      padding: 18px 20px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-    }
-
-    .gallery-item-caption-left {
+      padding: 16px 18px;
       display: flex;
       flex-direction: column;
       gap: 3px;
     }
 
-    .gallery-caption-label {
+    .gi-label {
       font-family: var(--font-sans);
       font-size: 8px;
       font-weight: 400;
@@ -1170,34 +1155,12 @@
       color: rgba(255,255,255,0.5);
     }
 
-    .gallery-caption-city {
+    .gi-city {
       font-family: var(--font-serif);
       font-size: 16px;
       font-weight: 300;
-      letter-spacing: 0.03em;
       color: rgba(255,255,255,0.95);
       line-height: 1;
-    }
-
-    .gallery-caption-arrow {
-      width: 26px;
-      height: 26px;
-      border: 1px solid rgba(255,255,255,0.35);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transform: translateY(4px);
-      transition: opacity 0.3s, transform 0.35s var(--ease-out-expo);
-    }
-    .gallery-caption-arrow svg {
-      width: 10px; height: 10px;
-      stroke: white; fill: none; stroke-width: 1.5;
-    }
-    .marquee-wrap:hover .gallery-caption-arrow {
-      opacity: 1;
-      transform: translateY(0);
     }
 
     /* ─── Word-by-word headline reveal ──────────────────── */
@@ -1764,122 +1727,64 @@
       Every home<br/>tells a <em>story</em>
     </h2>
   </div>
-  <!-- Two auto-scrolling marquee rows — opposite directions -->
-  <div class="marquee-wrap reveal">
 
-    <!-- Row 1 → scrolls left -->
-    <div class="marquee-track left">
-      <div class="gallery-item"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Barcelona</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Paris</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Tokyo</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Seoul</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Milan</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Dubai</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Amsterdam</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Sydney</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Berlin</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Singapore</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/a6f6f696b963a151706021b9493da233.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Madrid</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">New York</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">London</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Barcelona</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Paris</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Tokyo</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Seoul</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Milan</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Dubai</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Amsterdam</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Sydney</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Berlin</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Singapore</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/a6f6f696b963a151706021b9493da233.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Madrid</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">New York</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">London</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
+  <div class="mq-wrap">
+    <div class="mq-track mq-left">
+      <div class="gi"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" alt="Barcelona" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Barcelona</span></div></div>
+      <div class="gi"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" alt="Paris" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Paris</span></div></div>
+      <div class="gi"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" alt="Tokyo" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Tokyo</span></div></div>
+      <div class="gi"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" alt="Seoul" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Seoul</span></div></div>
+      <div class="gi"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" alt="Milan" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Milan</span></div></div>
+      <div class="gi"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" alt="Dubai" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Dubai</span></div></div>
+      <div class="gi"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" alt="Amsterdam" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Amsterdam</span></div></div>
+      <div class="gi"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" alt="Sydney" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Sydney</span></div></div>
+      <div class="gi"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" alt="Berlin" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Berlin</span></div></div>
+      <div class="gi"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" alt="Singapore" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Singapore</span></div></div>
+      <div class="gi"><img src="img/a6f6f696b963a151706021b9493da233.jpg" alt="Madrid" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Madrid</span></div></div>
+      <div class="gi"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" alt="New York" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">New York</span></div></div>
+      <div class="gi"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" alt="London" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">London</span></div></div>
+      <div class="gi"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" alt="Barcelona" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Barcelona</span></div></div>
+      <div class="gi"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" alt="Paris" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Paris</span></div></div>
+      <div class="gi"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" alt="Tokyo" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Tokyo</span></div></div>
+      <div class="gi"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" alt="Seoul" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Seoul</span></div></div>
+      <div class="gi"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" alt="Milan" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Milan</span></div></div>
+      <div class="gi"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" alt="Dubai" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Dubai</span></div></div>
+      <div class="gi"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" alt="Amsterdam" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Amsterdam</span></div></div>
+      <div class="gi"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" alt="Sydney" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Sydney</span></div></div>
+      <div class="gi"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" alt="Berlin" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Berlin</span></div></div>
+      <div class="gi"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" alt="Singapore" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Singapore</span></div></div>
+      <div class="gi"><img src="img/a6f6f696b963a151706021b9493da233.jpg" alt="Madrid" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Madrid</span></div></div>
+      <div class="gi"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" alt="New York" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">New York</span></div></div>
+      <div class="gi"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" alt="London" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">London</span></div></div>
     </div>
-
-    <!-- Row 2 → scrolls right -->
-    <div class="marquee-track right">
-      <div class="gallery-item"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">London</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">New York</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/a6f6f696b963a151706021b9493da233.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Madrid</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Singapore</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Berlin</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Sydney</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Amsterdam</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Dubai</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Milan</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Seoul</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Tokyo</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Paris</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Barcelona</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">London</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">New York</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/a6f6f696b963a151706021b9493da233.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Madrid</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Singapore</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Berlin</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Sydney</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Amsterdam</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Dubai</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Milan</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Seoul</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Tokyo</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Paris</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
-      <div class="gallery-item"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption"><div class="gallery-item-caption-left"><span class="gallery-caption-label">Residence</span><span class="gallery-caption-city">Barcelona</span></div><div class="gallery-caption-arrow"><svg viewBox="0 0 12 12"><path d="M2 10L10 2M10 2H4M10 2v6"/></svg></div></div></div>
+    <div class="mq-track mq-right">
+      <div class="gi"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" alt="London" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">London</span></div></div>
+      <div class="gi"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" alt="New York" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">New York</span></div></div>
+      <div class="gi"><img src="img/a6f6f696b963a151706021b9493da233.jpg" alt="Madrid" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Madrid</span></div></div>
+      <div class="gi"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" alt="Singapore" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Singapore</span></div></div>
+      <div class="gi"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" alt="Berlin" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Berlin</span></div></div>
+      <div class="gi"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" alt="Sydney" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Sydney</span></div></div>
+      <div class="gi"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" alt="Amsterdam" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Amsterdam</span></div></div>
+      <div class="gi"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" alt="Dubai" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Dubai</span></div></div>
+      <div class="gi"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" alt="Milan" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Milan</span></div></div>
+      <div class="gi"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" alt="Seoul" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Seoul</span></div></div>
+      <div class="gi"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" alt="Tokyo" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Tokyo</span></div></div>
+      <div class="gi"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" alt="Paris" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Paris</span></div></div>
+      <div class="gi"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" alt="Barcelona" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Barcelona</span></div></div>
+      <div class="gi"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" alt="London" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">London</span></div></div>
+      <div class="gi"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" alt="New York" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">New York</span></div></div>
+      <div class="gi"><img src="img/a6f6f696b963a151706021b9493da233.jpg" alt="Madrid" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Madrid</span></div></div>
+      <div class="gi"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" alt="Singapore" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Singapore</span></div></div>
+      <div class="gi"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" alt="Berlin" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Berlin</span></div></div>
+      <div class="gi"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" alt="Sydney" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Sydney</span></div></div>
+      <div class="gi"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" alt="Amsterdam" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Amsterdam</span></div></div>
+      <div class="gi"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" alt="Dubai" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Dubai</span></div></div>
+      <div class="gi"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" alt="Milan" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Milan</span></div></div>
+      <div class="gi"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" alt="Seoul" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Seoul</span></div></div>
+      <div class="gi"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" alt="Tokyo" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Tokyo</span></div></div>
+      <div class="gi"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" alt="Paris" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Paris</span></div></div>
+      <div class="gi"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" alt="Barcelona" /><div class="gi-overlay"></div><div class="gi-caption"><span class="gi-label">Residence</span><span class="gi-city">Barcelona</span></div></div>
     </div>
-
-  </div>
-
-    <!-- Row 2 → scrolls right -->
-    <div class="marquee-track right">
-      <div class="gallery-item"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · London</div></div>
-      <div class="gallery-item"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · New York</div></div>
-      <div class="gallery-item"><img src="img/a6f6f696b963a151706021b9493da233.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Madrid</div></div>
-      <div class="gallery-item"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Singapore</div></div>
-      <div class="gallery-item"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Berlin</div></div>
-      <div class="gallery-item"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Sydney</div></div>
-      <div class="gallery-item"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Amsterdam</div></div>
-      <div class="gallery-item"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Dubai</div></div>
-      <div class="gallery-item"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Milan</div></div>
-      <div class="gallery-item"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Seoul</div></div>
-      <div class="gallery-item"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Tokyo</div></div>
-      <div class="gallery-item"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Paris</div></div>
-      <div class="gallery-item"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Barcelona</div></div>
-      <div class="gallery-item"><img src="img/e4063a30418072cda38ad88e367f1952.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · London</div></div>
-      <div class="gallery-item"><img src="img/de4d74c8a777146200536beb2632a1d5.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · New York</div></div>
-      <div class="gallery-item"><img src="img/a6f6f696b963a151706021b9493da233.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Madrid</div></div>
-      <div class="gallery-item"><img src="img/7bb021b0259334d5fd13cdb4adc3c22b.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Singapore</div></div>
-      <div class="gallery-item"><img src="img/7379637da3d5fed973800c66515bcdfd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Berlin</div></div>
-      <div class="gallery-item"><img src="img/6298dd29d8e67fa608fda95908fa8184.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Sydney</div></div>
-      <div class="gallery-item"><img src="img/46996acf3a893ad0c288c7f06b7d33f7.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Amsterdam</div></div>
-      <div class="gallery-item"><img src="img/424b019e0ecf81da7e132a85d8dd1e84.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Dubai</div></div>
-      <div class="gallery-item"><img src="img/2c9130e6c9a30b8688b79652a957ae11.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Milan</div></div>
-      <div class="gallery-item"><img src="img/2355f197f8a6ca22d819f11a8df488b3.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Seoul</div></div>
-      <div class="gallery-item"><img src="img/0692ce4a6fae779867c45fb1f94d7fb1.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Tokyo</div></div>
-      <div class="gallery-item"><img src="img/056b14e20bf3c0513811d7d8813442cd.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Paris</div></div>
-      <div class="gallery-item"><img src="img/0264d9de67c6c42fb5296ccb5f91f745.jpg" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Residence · Barcelona</div></div>
-    </div>
-
-  </div>
-
-
-
-    <!-- Row 2 → scrolls right -->
-    <div class="marquee-track right">
-      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Amsterdam</div></div>
-      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Madrid</div></div>
-      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · Berlin</div></div>
-      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Sydney</div></div>
-      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Dubai</div></div>
-      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · NYC</div></div>
-      <!-- duplicate -->
-      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Amsterdam</div></div>
-      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Madrid</div></div>
-      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · Berlin</div></div>
-      <div class="gallery-item"><img src="house3.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Maison Verte · Sydney</div></div>
-      <div class="gallery-item"><img src="house1.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Casa Noir · Dubai</div></div>
-      <div class="gallery-item"><img src="house2.webp" class="gallery-item-img" /><div class="gallery-item-overlay"></div><div class="gallery-item-caption">Villa Lumière · NYC</div></div>
-    </div>
-
   </div>
 </section>
 
