@@ -2018,23 +2018,6 @@
     }
   });
 
-  // ─── Nav dark/light — IntersectionObserver ─────────────────
-  // Watches sections marked [data-nav-dark]; switches pill to white
-  // text whenever one of them occupies the top nav zone.
-  const navEl = document.querySelector('nav');
-  const darkSections = document.querySelectorAll('[data-nav-dark]');
-  let darkCount = 0;
-
-  const navObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => { darkCount += e.isIntersecting ? 1 : -1; });
-    darkCount = Math.max(0, darkCount);
-    navEl.classList.toggle('nav-dark', darkCount > 0);
-  }, {
-    rootMargin: '0px 0px -90% 0px', // only the top 10% (nav strip)
-    threshold: 0
-  });
-
-  darkSections.forEach(s => navObserver.observe(s));
 
   // ─── Init ───────────────────────────────────────────────────
   setTimeout(() => {
