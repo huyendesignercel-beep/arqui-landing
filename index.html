@@ -1403,19 +1403,47 @@
       .hero-content {
         grid-template-columns: 1fr;
         padding: 0 32px;
+        text-align: center;
+        align-items: center;
+        justify-items: center;
       }
-      .hero-right { display: none; }
+      /* Show house on mobile — smaller, centred below text */
+      .hero-right {
+        display: flex;
+        justify-content: center;
+        margin-top: 24px;
+      }
+      .house-wrapper {
+        width: clamp(240px, 72vw, 420px);
+        height: clamp(240px, 72vw, 420px);
+      }
       .steps-bar { padding: 0 32px; }
       .features-grid { grid-template-columns: 1fr; }
       .showcase-layout { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 768px) {
-      nav { padding: 0 24px; }
+      nav {
+        padding: 0 20px;
+        width: calc(100vw - 32px);
+        height: 50px;
+      }
       .nav-links { display: none; }
       .hero-content { padding: 0 24px; }
       .steps-bar { display: none; }
       .section { padding: 80px 24px; }
+
+      /* Footer: stack vertically */
+      footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 40px 24px 32px;
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        gap: 16px 24px;
+      }
     }
   </style>
 </head>
