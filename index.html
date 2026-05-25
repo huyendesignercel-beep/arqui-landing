@@ -1465,7 +1465,7 @@
 </nav>
 
 <!-- ─── Hero ───────────────────────────────────────────── -->
-<section class="hero" id="hero">
+<section class="hero" id="hero" data-nav-dark>
   <div class="hero-sticky" id="heroSticky">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
@@ -1667,7 +1667,7 @@
 </section>
 
 <!-- ─── Showcase ────────────────────────────────────────── -->
-<section class="section showcase" id="showcase">
+<section class="section showcase" id="showcase" data-nav-dark>
   <div class="showcase-layout">
 
     <div class="showcase-text-col">
@@ -2018,18 +2018,23 @@
     }
   });
 
-  // ─── Nav dark/light auto-switch ────────────────────────────
+  // ─── Nav dark/light — IntersectionObserver ─────────────────
+  // Watches sections marked [data-nav-dark]; switches pill to white
+  // text whenever one of them occupies the top nav zone.
   const navEl = document.querySelector('nav');
-  function updateNavTheme() {
-    // Sample the pixel colour behind the nav centre point
-    const navH = navEl.offsetHeight + 18; // top offset
-    // Check if we've scrolled past the hero (100vh)
-    // On dark hero → white text; on white sections → dark text
-    const onHero = window.scrollY < window.innerHeight * 0.6;
-    navEl.classList.toggle('nav-dark', onHero);
-  }
-  window.addEventListener('scroll', updateNavTheme, { passive: true });
-  updateNavTheme();
+  const darkSections = document.querySelectorAll('[data-nav-dark]');
+  let darkCount = 0;
+
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { darkCount += e.isIntersecting ? 1 : -1; });
+    darkCount = Math.max(0, darkCount);
+    navEl.classList.toggle('nav-dark', darkCount > 0);
+  }, {
+    rootMargin: '0px 0px -90% 0px', // only the top 10% (nav strip)
+    threshold: 0
+  });
+
+  darkSections.forEach(s => navObserver.observe(s));
 
   // ─── Init ───────────────────────────────────────────────────
   setTimeout(() => {
