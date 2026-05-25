@@ -2024,8 +2024,9 @@
     // Sample the pixel colour behind the nav centre point
     const navH = navEl.offsetHeight + 18; // top offset
     // Check if we've scrolled past the hero (100vh)
-    const pastHero = window.scrollY > window.innerHeight * 0.6;
-    navEl.classList.toggle('nav-dark', pastHero);
+    // On dark hero → white text; on white sections → dark text
+    const onHero = window.scrollY < window.innerHeight * 0.6;
+    navEl.classList.toggle('nav-dark', onHero);
   }
   window.addEventListener('scroll', updateNavTheme, { passive: true });
   updateNavTheme();
