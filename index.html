@@ -245,6 +245,59 @@
 
     .nav-menu-btn:hover span { width: 20px; }
 
+    /* Desktop: ẩn cả search button và hamburger */
+    .nav-action-btn { display: none; }
+    .nav-menu-btn   { display: none; }
+
+    /* ─── Mobile dropdown menu ───────────────────────────── */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(860px, calc(100vw - 32px));
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(24px) saturate(1.8);
+      -webkit-backdrop-filter: blur(24px) saturate(1.8);
+      border: 1px solid rgba(255,255,255,0.6);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      border-radius: 16px;
+      z-index: 99;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s var(--ease-out-expo), transform 0.25s var(--ease-out-expo);
+      transform: translateX(-50%) translateY(-8px);
+    }
+    .mobile-menu.open {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+    .mobile-menu a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--black);
+      text-decoration: none;
+      border-bottom: 1px solid var(--gray-100);
+      letter-spacing: 0.02em;
+      transition: background 0.15s;
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { background: var(--gray-50); }
+    .mobile-menu a span {
+      font-size: 10px;
+      color: var(--gray-400);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
     /* ─── Hero Section — discrete step scroll ───────────── */
     .hero {
       position: relative;
@@ -1776,6 +1829,11 @@
       /* Hide avatar tag (architects following) */
       .hero-tag { display: none; }
 
+      /* Mobile nav: ẩn search circle, hiện hamburger */
+      .nav-action-btn { display: none; }
+      .nav-menu-btn   { display: flex; cursor: pointer; }
+      .mobile-menu    { display: block; }
+
       /* Hide all floating overlays on the house image */
       .house-card,
       .house-chip { display: none; }
@@ -1875,6 +1933,16 @@
     </div>
   </div>
 </nav>
+
+<!-- ─── Mobile Menu Dropdown ───────────────────────────── -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hero">Home <span>01</span></a>
+  <a href="#features">Features <span>02</span></a>
+  <a href="#showcase">Projects <span>03</span></a>
+  <a href="#gallery">Portfolio <span>04</span></a>
+  <a href="#dashboard">Overview <span>05</span></a>
+  <a href="#cta">Contact <span>06</span></a>
+</div>
 
 <!-- ─── Hero ───────────────────────────────────────────── -->
 <section class="hero" id="hero" data-nav-dark>
@@ -2150,7 +2218,7 @@
 </section>
 
 <!-- ─── Gallery ────────────────────────────────────────── -->
-<section class="gallery">
+<section class="gallery" id="gallery">
   <div class="gallery-header">
     <div class="section-eyebrow reveal">Portfolio</div>
     <h2 class="section-title reveal reveal-delay-1">
@@ -2219,7 +2287,7 @@
 </section>
 
 <!-- ─── Project Dashboard ──────────────────────────────── -->
-<section class="dashboard-section">
+<section class="dashboard-section" id="dashboard">
   <div class="dashboard-header">
     <div class="section-eyebrow reveal">Live Project</div>
     <h2 class="section-title reveal reveal-delay-1">Project <em>overview</em></h2>
@@ -2365,7 +2433,7 @@
 </section>
 
 <!-- ─── CTA ────────────────────────────────────────────── -->
-<section class="cta-section">
+<section class="cta-section" id="cta">
   <div class="cta-inner">
     <div class="cta-eyebrow reveal">Begin Your Journey</div>
     <h2 class="cta-title reveal reveal-delay-1">
@@ -2472,6 +2540,24 @@
 
   // Touch support — horizontal swipe on hero switches houses
   let touchStartX = 0, touchStartY = 0;
+  // ─── Mobile menu toggle ─────────────────────────────────────
+  const mobileMenu = document.getElementById('mobileMenu');
+  const menuBtn    = document.querySelector('.nav-menu-btn');
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+    // Close when a link is tapped
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    });
+    // Close on outside tap
+    document.addEventListener('touchstart', (e) => {
+      if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target))
+        mobileMenu.classList.remove('open');
+    }, { passive: true });
+  }
+
   let touchDir = null; // 'h' = horizontal, 'v' = vertical
 
   window.addEventListener('touchstart', (e) => {
