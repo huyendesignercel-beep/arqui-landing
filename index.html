@@ -1830,9 +1830,15 @@
       .hero-tag { display: none; }
 
       /* Mobile nav: ẩn search circle, hiện hamburger */
-      .nav-action-btn { display: none; }
-      .nav-menu-btn   { display: flex; cursor: pointer; }
-      .mobile-menu    { display: block; }
+      .nav-action-btn { display: none !important; }
+      .nav-menu-btn {
+        display: flex !important;
+        cursor: pointer;
+        padding: 10px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-menu { display: block; }
 
       /* Hide all floating overlays on the house image */
       .house-card,
@@ -2544,13 +2550,23 @@
   const mobileMenu = document.getElementById('mobileMenu');
   const menuBtn    = document.querySelector('.nav-menu-btn');
   if (menuBtn && mobileMenu) {
-    menuBtn.addEventListener('click', () => {
+    let lastToggle = 0;
+    function toggleMenu(e) {
+      e.stopPropagation();
+      const now = Date.now();
+      if (now - lastToggle < 300) return; // debounce
+      lastToggle = now;
       mobileMenu.classList.toggle('open');
-    });
+    }
+    menuBtn.addEventListener('click', toggleMenu);
+    menuBtn.addEventListener('touchend', toggleMenu, { passive: false });
+
     // Close when a link is tapped
     mobileMenu.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+      a.addEventListener('touchend', () => mobileMenu.classList.remove('open'), { passive: true });
     });
+
     // Close on outside tap
     document.addEventListener('touchstart', (e) => {
       if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target))
